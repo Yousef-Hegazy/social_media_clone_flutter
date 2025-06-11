@@ -1,0 +1,29 @@
+import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
+import 'package:social_media_clean/core/error/api_error_response.dart';
+import 'package:social_media_clean/core/error/failure.dart';
+
+Future<Either<Failure, T>> handleRequest<T>({
+  required Future<Response> Function() request,
+  required T Function(Map<String, dynamic>) fromMap,
+}) async {
+  try {
+    final res = await request();
+
+    if (res.statusCode == 200) {
+      final result = fromMap(res.data);
+      return right(result);
+    } else {
+      final err = ApiErrorResponse.fromMap(res.data);
+      return left(ServerFailure(err.detail));
+    }
+  } on DioException catch (e) {
+    if (e.response?.data != null) {
+      final err = ApiErrorResponse.fromMap(e.response!.data);
+      return left(ServerFailure(err.detail));
+    }
+    return left(ServerFailure(e.message ?? "An unknown error occurred"));
+  } catch (e) {
+    return left(ServerFailure(e.toString()));
+  }
+}
