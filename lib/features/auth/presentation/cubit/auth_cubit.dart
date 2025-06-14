@@ -109,7 +109,7 @@ class AuthCubit extends Cubit<AuthState> {
     final res = await _updateProfileUsecase(user: user, image: image);
 
     res.fold((e) {
-      emit(AuthError(e.message));
+      emit(ProfileError(e.message, user));
     }, (updatedUser) {
       _secureStorage.write(key: Constants.tokenKey, value: updatedUser.token);
       emit(Authenticated(updatedUser));

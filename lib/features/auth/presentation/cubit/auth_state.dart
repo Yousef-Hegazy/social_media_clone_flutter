@@ -17,3 +17,9 @@ final class Authenticated extends AuthState {
 
   Authenticated(this.user);
 }
+
+final class ProfileError extends Authenticated {
+  final String message;
+
+  ProfileError(this.message, super.user);
+}

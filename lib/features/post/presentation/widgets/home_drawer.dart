@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_clean/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:social_media_clean/features/home/presentation/widgets/home_drawer_tile.dart';
+import 'package:social_media_clean/features/post/presentation/widgets/home_drawer_tile.dart';
 import 'package:social_media_clean/features/profile/presentation/screens/profile_screen.dart';
 
 class HomeDrawer extends StatelessWidget {

@@ -39,6 +39,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   flutter_bloc: ^9.1.1
   dartz: ^0.10.1
+  file_picker: ^10.1.9
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

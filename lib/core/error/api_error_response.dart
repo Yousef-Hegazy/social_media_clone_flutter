@@ -3,13 +3,13 @@ import 'dart:convert';
 
 class ApiErrorResponse {
   final String instance;
-  final String detail;
+  final String? detail;
   final String type;
   final String title;
 
   ApiErrorResponse({
     required this.instance,
-    required this.detail,
+    this.detail,
     required this.type,
     required this.title,
   });
@@ -40,7 +40,7 @@ class ApiErrorResponse {
   factory ApiErrorResponse.fromMap(Map<String, dynamic> map) {
     return ApiErrorResponse(
       instance: map['instance'] as String,
-      detail: map['detail'] as String,
+      detail: map['detail'] != null ? map['detail'] as String : null,
       type: map['type'] as String,
       title: map['title'] as String,
     );

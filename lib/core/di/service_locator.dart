@@ -9,6 +9,11 @@ import 'package:social_media_clean/features/auth/domain/usecases/login_usecase.d
 import 'package:social_media_clean/features/auth/domain/usecases/register_usecase.dart';
 import 'package:social_media_clean/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:social_media_clean/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:social_media_clean/features/post/data/repositories/post_repo_impl.dart';
+import 'package:social_media_clean/features/post/domain/repositories/post_repo.dart';
+import 'package:social_media_clean/features/post/domain/usecases/create_post_usecase.dart';
+import 'package:social_media_clean/features/post/domain/usecases/get_posts_usecase.dart';
+import 'package:social_media_clean/features/post/presentation/cubit/posts_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -29,7 +34,7 @@ void init() {
       () => DioClient.create(sl<FlutterSecureStorage>()));
 
   // Auth
-  sl.registerLazySingleton<AuthRepo>(() => AuthRepoImpl(sl<Dio>()));
+  sl.registerFactory<AuthRepo>(() => AuthRepoImpl(sl<Dio>()));
   sl.registerFactory(() => LoginUsecase(sl()));
   sl.registerFactory(() => RegisterUsecase(sl()));
   sl.registerFactory(() => GetCurrentUserUsecase(sl()));
@@ -43,4 +48,12 @@ void init() {
       sl<UpdateProfileUsecase>(),
     ),
   );
+
+  // Posts
+  sl.registerFactory<PostRepo>(() => PostRepoImpl(sl<Dio>()));
+  sl.registerFactory<GetPostsUsecase>(() => GetPostsUsecase(sl<PostRepo>()));
+  sl.registerFactory<CreatePostUsecase>(
+      () => CreatePostUsecase(sl<PostRepo>()));
+  sl.registerLazySingleton<PostsCubit>(
+      () => PostsCubit(sl<GetPostsUsecase>(), sl<CreatePostUsecase>()));
 }

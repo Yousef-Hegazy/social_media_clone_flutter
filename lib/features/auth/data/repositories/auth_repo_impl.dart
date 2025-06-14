@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
@@ -55,14 +56,30 @@ class AuthRepoImpl implements AuthRepo {
   }) async {
     final model = UserModel.fromEntity(user);
 
-    final formData = FormData.fromMap({
-      'user': {
-        'name': model.name,
-        'email': model.email,
-        'bio': model.bio,
-      },
-      if (image != null) 'image': await MultipartFile.fromFile(image.path),
-    });
+    final formData = FormData();
+
+    formData.files.add(
+      MapEntry(
+        'user',
+        MultipartFile.fromString(
+          jsonEncode({
+            'name': model.name,
+            'email': model.email,
+            'bio': model.bio,
+          }),
+          contentType: DioMediaType("application", "json"),
+        ),
+      ),
+    );
+
+    if (image != null) {
+      formData.files.add(MapEntry(
+          'image',
+          await MultipartFile.fromFile(
+            image.path,
+            filename: image.path.split('/').last,
+          )));
+    }
 
     return handleRequest<User>(
       request: () => _dio.post("/auth/update-user",

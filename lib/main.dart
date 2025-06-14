@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_clean/core/di/service_locator.dart';
 import 'package:social_media_clean/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:social_media_clean/features/auth/presentation/screens/login_screen.dart';
-import 'package:social_media_clean/features/home/presentation/screens/home_screen.dart';
+import 'package:social_media_clean/features/post/presentation/cubit/posts_cubit.dart';
+import 'package:social_media_clean/features/post/presentation/screens/home_screen.dart';
 import 'package:social_media_clean/splash_screen.dart';
 import 'package:social_media_clean/theme/dark_mode.dart';
 import 'package:social_media_clean/theme/light_mode.dart';
@@ -15,8 +16,12 @@ void main() async {
 
   init();
 
-  runApp(BlocProvider(
-    create: (context) => sl<AuthCubit>()..checkAuth(),
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider<AuthCubit>(
+          create: (context) => sl<AuthCubit>()..checkAuth()),
+      BlocProvider<PostsCubit>(create: (context) => sl<PostsCubit>()),
+    ],
     child: BlocListener<AuthCubit, AuthState>(
       listener: (ctx, state) {
         if (state is AuthInitial || state is AuthError) {
@@ -25,12 +30,6 @@ void main() async {
             (route) => false,
           );
         }
-        // else if (state is Authenticated) {
-        //   navigatorKey.currentState?.pushAndRemoveUntil(
-        //     MaterialPageRoute(builder: (context) => const HomeScreen()),
-        //     (route) => false,
-        //   );
-        // }
       },
       child: const MyApp(),
     ),

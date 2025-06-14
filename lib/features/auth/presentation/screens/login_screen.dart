@@ -5,7 +5,7 @@ import 'package:social_media_clean/core/widgets/app_button.dart';
 import 'package:social_media_clean/core/widgets/app_text_field.dart';
 import 'package:social_media_clean/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:social_media_clean/features/auth/presentation/screens/register_screen.dart';
-import 'package:social_media_clean/features/home/presentation/screens/home_screen.dart';
+import 'package:social_media_clean/features/post/presentation/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
