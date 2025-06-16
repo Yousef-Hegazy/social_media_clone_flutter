@@ -106,6 +106,10 @@ class ProfileView extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: "${Constants.baseUrl}/files/${user.imageUrl}",
                     errorWidget: (ctx, url, error) => Icon(Icons.error_rounded),
+                    placeholder: (context, url) => const SizedBox(
+                      width: 200,
+                      height: 200,
+                    ),
                     imageBuilder: (context, imageProvider) => Container(
                       width: 200,
                       height: 200,

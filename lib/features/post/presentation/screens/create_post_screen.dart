@@ -61,21 +61,24 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           actions: [
             BlocConsumer<PostsCubit, PostsState>(
               listener: (context, state) {
-                if (state is PostCreationError) {
+                if (state.creationError != null) {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.message)),
+                    SnackBar(content: Text(state.creationError!)),
                   );
-                } else if (state is PostCreated) {
+                } else if (state.createdPost != null) {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Profile updated successfully')),
+                    const SnackBar(content: Text('Post created successfully')),
                   );
+
+                  context.read<PostsCubit>().fetchInitialPosts();
 
                   Navigator.pop(context);
                 }
               },
               builder: (ctx, state) => IconButton(
-                onPressed: state is PostsLoading
+                onPressed: state.isLoading
                     ? null
                     : () {
                         if (_formKey.currentState?.validate() ?? false) {
@@ -88,62 +91,64 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 icon: SizedBox(
                     height: 20,
                     width: 20,
-                    child: state is PostsLoading
+                    child: state.isLoading
                         ? const CircularProgressIndicator.adaptive()
                         : const Icon(Icons.check_rounded)),
               ),
             )
           ],
         ),
-        body: SafeArea(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  InkWell(
-                    onTap: _pickImage,
-                    child: _image != null
-                        ? Container(
-                            height: 250,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: FileImage(
-                                  File(_image!.path!),
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    InkWell(
+                      onTap: _pickImage,
+                      child: _image != null
+                          ? Container(
+                              height: 250,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: FileImage(
+                                    File(_image!.path!),
+                                  ),
                                 ),
                               ),
+                            )
+                          : SizedBox(
+                              height: 250,
+                              width: double.infinity,
+                              child: const Icon(Icons.image),
                             ),
-                          )
-                        : SizedBox(
-                            height: 250,
-                            width: double.infinity,
-                            child: const Icon(Icons.image),
-                          ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text("Content"),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  AppTextFormField(
-                    controller: _text,
-                    hintText: 'Content',
-                    textInputAction: TextInputAction.next,
-                    minLines: 2,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the post content';
-                      }
-                      return null;
-                    },
-                  )
-                ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text("Content"),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    AppTextFormField(
+                      controller: _text,
+                      hintText: 'Content',
+                      textInputAction: TextInputAction.next,
+                      minLines: 2,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the post content';
+                        }
+                        return null;
+                      },
+                    )
+                  ],
+                ),
               ),
             ),
           ),

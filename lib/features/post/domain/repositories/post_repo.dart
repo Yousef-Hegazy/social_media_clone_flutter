@@ -13,6 +13,10 @@ abstract class PostRepo {
 
   Future<Either<Failure, Post>> getPostById(String id);
 
-  Future<Either<Failure, PagedResponse<Post>>> fetchPosts(
-      {required int page, required int pageSize});
+  Future<Either<Failure, PagedResponse<Post>>> fetchPosts({
+    required int page,
+    required int pageSize,
+  });
+
+  Future<Either<Failure, void>> deletePost(String id);
 }

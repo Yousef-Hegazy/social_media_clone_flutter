@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:social_media_clean/features/post/domain/entities/post.dart';
@@ -8,6 +9,7 @@ class PostModel {
   final String username;
   final String text;
   final String imageUrl;
+  final String? userProfileImageUrl;
   final DateTime timestamp;
 
   PostModel({
@@ -16,6 +18,7 @@ class PostModel {
     required this.username,
     required this.text,
     required this.imageUrl,
+    this.userProfileImageUrl,
     required this.timestamp,
   });
 
@@ -27,6 +30,7 @@ class PostModel {
       username: username,
       text: text,
       imageUrl: imageUrl,
+      userProfileImageUrl: userProfileImageUrl,
       timestamp: timestamp,
     );
   }
@@ -39,6 +43,7 @@ class PostModel {
       username: post.username,
       text: post.text,
       imageUrl: post.imageUrl,
+      userProfileImageUrl: post.userProfileImageUrl,
       timestamp: post.timestamp,
     );
   }
@@ -49,6 +54,7 @@ class PostModel {
     String? username,
     String? text,
     String? imageUrl,
+    String? userProfileImageUrl,
     DateTime? timestamp,
   }) {
     return PostModel(
@@ -57,6 +63,7 @@ class PostModel {
       username: username ?? this.username,
       text: text ?? this.text,
       imageUrl: imageUrl ?? this.imageUrl,
+      userProfileImageUrl: userProfileImageUrl ?? this.userProfileImageUrl,
       timestamp: timestamp ?? this.timestamp,
     );
   }
@@ -68,7 +75,8 @@ class PostModel {
       'username': username,
       'text': text,
       'imageUrl': imageUrl,
-      'timestamp': timestamp.millisecondsSinceEpoch,
+      'userProfileImageUrl': userProfileImageUrl,
+      'timestamp': timestamp,
     };
   }
 
@@ -79,6 +87,9 @@ class PostModel {
       username: map['username'] as String,
       text: map['text'] as String,
       imageUrl: map['imageUrl'] as String,
+      userProfileImageUrl: map['userProfileImageUrl'] != null
+          ? map['userProfileImageUrl'] as String
+          : null,
       timestamp: DateTime.parse(map['timestamp'] as String),
     );
   }
@@ -90,7 +101,7 @@ class PostModel {
 
   @override
   String toString() {
-    return 'PostModel(id: $id, userId: $userId, username: $username, text: $text, imageUrl: $imageUrl, timestamp: $timestamp)';
+    return 'PostModel(id: $id, userId: $userId, username: $username, text: $text, imageUrl: $imageUrl, userProfileImageUrl: $userProfileImageUrl, timestamp: $timestamp)';
   }
 
   @override
@@ -102,6 +113,7 @@ class PostModel {
         other.username == username &&
         other.text == text &&
         other.imageUrl == imageUrl &&
+        other.userProfileImageUrl == userProfileImageUrl &&
         other.timestamp == timestamp;
   }
 
@@ -112,6 +124,7 @@ class PostModel {
         username.hashCode ^
         text.hashCode ^
         imageUrl.hashCode ^
+        userProfileImageUrl.hashCode ^
         timestamp.hashCode;
   }
 }

@@ -69,4 +69,11 @@ class PostRepoImpl implements PostRepo {
       fromMap: (map) => PostModel.fromMap(map).toEntity(),
     );
   }
+
+  @override
+  Future<Either<Failure, void>> deletePost(String id) {
+    return handleVoidRequest(
+      request: () => _dio.delete("/posts/$id"),
+    );
+  }
 }

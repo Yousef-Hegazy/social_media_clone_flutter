@@ -29,6 +29,29 @@ Future<Either<Failure, T>> handleRequest<T>({
   }
 }
 
+Future<Either<Failure, void>> handleVoidRequest<T>({
+  required Future<Response> Function() request,
+}) async {
+  try {
+    final res = await request();
+
+    if (res.statusCode == 200) {
+      return right(null);
+    } else {
+      final err = ApiErrorResponse.fromMap(res.data);
+      return left(ServerFailure(err.detail ?? "An unknown error occurred"));
+    }
+  } on DioException catch (e) {
+    if (e.response?.data != null) {
+      final err = ApiErrorResponse.fromMap(e.response!.data);
+      return left(ServerFailure(err.detail ?? "An unknown error occurred"));
+    }
+    return left(ServerFailure(e.message ?? "An unknown error occurred"));
+  } catch (e) {
+    return left(ServerFailure(e.toString()));
+  }
+}
+
 Future<Either<Failure, PagedResponse<T>>> handlePagedRequest<T>({
   required Future<Response> Function() request,
   required T Function(Map<String, dynamic>) fromMap,

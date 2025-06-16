@@ -4,6 +4,7 @@ base class Post {
   final String username;
   final String text;
   final String imageUrl;
+  final String? userProfileImageUrl;
   final DateTime timestamp;
 
   const Post({
@@ -13,5 +14,6 @@ base class Post {
     required this.text,
     required this.imageUrl,
     required this.timestamp,
+    this.userProfileImageUrl,
   });
 }

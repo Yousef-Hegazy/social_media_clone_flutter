@@ -12,6 +12,7 @@ import 'package:social_media_clean/features/auth/presentation/cubit/auth_cubit.d
 import 'package:social_media_clean/features/post/data/repositories/post_repo_impl.dart';
 import 'package:social_media_clean/features/post/domain/repositories/post_repo.dart';
 import 'package:social_media_clean/features/post/domain/usecases/create_post_usecase.dart';
+import 'package:social_media_clean/features/post/domain/usecases/delete_post_usecase.dart';
 import 'package:social_media_clean/features/post/domain/usecases/get_posts_usecase.dart';
 import 'package:social_media_clean/features/post/presentation/cubit/posts_cubit.dart';
 
@@ -51,9 +52,20 @@ void init() {
 
   // Posts
   sl.registerFactory<PostRepo>(() => PostRepoImpl(sl<Dio>()));
+
   sl.registerFactory<GetPostsUsecase>(() => GetPostsUsecase(sl<PostRepo>()));
+
+  sl.registerFactory<DeletePostUsecase>(
+      () => DeletePostUsecase(sl<PostRepo>()));
+
   sl.registerFactory<CreatePostUsecase>(
       () => CreatePostUsecase(sl<PostRepo>()));
+
   sl.registerLazySingleton<PostsCubit>(
-      () => PostsCubit(sl<GetPostsUsecase>(), sl<CreatePostUsecase>()));
+    () => PostsCubit(
+      sl<GetPostsUsecase>(),
+      sl<CreatePostUsecase>(),
+      sl<DeletePostUsecase>(),
+    ),
+  );
 }
