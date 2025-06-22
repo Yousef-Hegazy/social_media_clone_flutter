@@ -6,6 +6,7 @@ import 'package:social_media_clean/core/utils/constants.dart';
 import 'package:social_media_clean/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:social_media_clean/features/post/domain/entities/post.dart';
 import 'package:social_media_clean/features/post/presentation/cubit/posts_cubit.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostCard extends StatefulWidget {
   final Post post;
@@ -64,88 +65,176 @@ class _PostCardState extends State<PostCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _PostImage(imageUrl: widget.post.imageUrl),
-              const SizedBox(height: 16),
-              BlocBuilder<AuthCubit, AuthState>(
-                builder: (ctx, state) {
-                  if (state is Authenticated &&
-                      state.user.id.toLowerCase() ==
-                          widget.post.userId.toLowerCase()) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "You",
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    widget.post.userProfileImageUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl:
+                                "${Constants.baseUrl}/files/${widget.post.userProfileImageUrl}",
+                            errorWidget: (_, url, error) => const SizedBox(
+                              width: 35,
+                              height: 35,
+                              child: Icon(Icons.error),
+                            ),
+                            placeholder: (_, url) => const SizedBox(
+                              width: 35,
+                              height: 35,
+                            ),
+                            imageBuilder: (_, builder) => SizedBox(
+                              width: 35,
+                              height: 35,
+                              child: CircleAvatar(
+                                backgroundImage: builder,
+                                radius: 50,
+                              ),
+                            ),
+                          )
+                        : SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: CircleAvatar(
+                              radius: 50,
+                              child: Icon(Icons.person),
+                            ),
+                          ),
+                    SizedBox(
+                      width: 12,
+                    ),
+                    Expanded(
+                      child: BlocBuilder<AuthCubit, AuthState>(
+                        builder: (_, state) {
+                          if (state is Authenticated &&
+                              state.user.id.toLowerCase() ==
+                                  widget.post.userId.toLowerCase()) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "You",
+                                  style: TextStyle(
+                                    color: colors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                BlocConsumer<PostsCubit, PostsState>(
+                                  listener: (_, state) {
+                                    if (state.deletionError != null) {
+                                      ScaffoldMessenger.of(context)
+                                          .removeCurrentSnackBar();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content:
+                                                Text(state.deletionError!)),
+                                      );
+                                      context.read<PostsCubit>().clearFlags();
+                                    } else if (state.deletionSuccess == true &&
+                                        state.deletionError == null) {
+                                      ScaffoldMessenger.of(context)
+                                          .removeCurrentSnackBar();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text('Post deleted successfully'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  builder: (_, state) {
+                                    final isDeleting = state.isFetching;
+
+                                    return IconButton(
+                                      iconSize: 20,
+                                      tooltip: isDeleting
+                                          ? "Deleting Post..."
+                                          : "Delete Post",
+                                      style: IconButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      onPressed: showDeleteConfirm,
+                                      icon: isDeleting
+                                          ? SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator
+                                                  .adaptive(
+                                                strokeWidth: 2,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation(
+                                                  colors.primary,
+                                                ),
+                                              ),
+                                            )
+                                          : Icon(
+                                              CupertinoIcons.delete,
+                                            ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          }
+
+                          return Text(
+                            widget.post.username,
                             style: TextStyle(
                               color: colors.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
-                          ),
-                          BlocConsumer<PostsCubit, PostsState>(
-                            listener: (ctx, state) {
-                              if (state.deletionError != null) {
-                                ScaffoldMessenger.of(context)
-                                    .removeCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(state.deletionError!)),
-                                );
-                                context.read<PostsCubit>().clearFlags();
-                              } else if (state.deletionSuccess == true &&
-                                  state.deletionError == null) {
-                                ScaffoldMessenger.of(context)
-                                    .removeCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Post deleted successfully'),
-                                  ),
-                                );
-                              }
-                            },
-                            builder: (context, state) {
-                              final isDeleting = state.isFetching;
-
-                              return GestureDetector(
-                                onTap: showDeleteConfirm,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: isDeleting
-                                      ? CircularProgressIndicator.adaptive(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation(
-                                              colors.primary),
-                                        )
-                                      : Icon(
-                                          CupertinoIcons.delete,
-                                        ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  }
-
-                  return _PaddedText(
-                    widget.post.username,
-                    style: TextStyle(
-                      color: colors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
+              _PostImage(imageUrl: widget.post.imageUrl),
+              const SizedBox(height: 12),
               _PaddedText(
                 widget.post.text,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 20),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                child: Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        iconSize: 20,
+                        iconColor: Colors.red.shade800,
+                      ),
+                      icon: Icon(
+                        CupertinoIcons.heart,
+                      ),
+                      label: Text("0"),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        iconSize: 20,
+                        iconColor: Colors.blue.shade800,
+                      ),
+                      icon: Icon(
+                        CupertinoIcons.chat_bubble_2,
+                      ),
+                      label: Text("0"),
+                    ),
+                    const Spacer(),
+                    Text(timeago.format(widget.post.timestamp))
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -223,7 +312,6 @@ class _PostImage extends StatelessWidget {
         height: 350,
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
           image: DecorationImage(
             image: imageProvider,
             fit: BoxFit.cover,
@@ -236,13 +324,11 @@ class _PostImage extends StatelessWidget {
 
 class _PaddedText extends StatelessWidget {
   final String text;
-  final TextStyle? style;
   final int? maxLines;
   final TextOverflow? overflow;
 
   const _PaddedText(
     this.text, {
-    this.style,
     this.maxLines,
     this.overflow,
   });
@@ -253,7 +339,6 @@ class _PaddedText extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text(
         text,
-        style: style,
         maxLines: maxLines,
         overflow: overflow,
       ),

@@ -38,7 +38,7 @@ class PostRepoImpl implements PostRepo {
       'image',
       await MultipartFile.fromFile(
         image.path,
-        filename: image.path.split('/').last,
+        filename: image.path.split(Platform.pathSeparator).last,
       ),
     ));
 
